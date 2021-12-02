@@ -238,6 +238,8 @@ body {
     user-select: none;
 }
 
+
+
 .location-mark {
     stroke: #3aff3a;
     stroke-width: 2.5;
@@ -306,3 +308,43 @@ body {
 #closing {
     padding-bottom: 2.5rem;
 }
+
+
+table, th, td,#testFunction {
+    position: relative;
+    z-index: 2;   
+    padding: 1px;
+}
+
+table {
+    border:1px solid #ffffff;
+    border-collapse: collapse;
+    padding: 2.5 rem;
+}
+
+th, td, tr{
+    background-color: #424242;
+    padding: 0.5rem;
+    font-size: large;
+} 
+
+.container{
+    padding: 2.5rem;
+    width:20%;
+}
+
+
+.btnContainer{
+    width:100%;
+    margin-top: 1rem;
+}
+
+.backBtn{
+    position: absolute;
+    right: -5px;    
+    width: 10rem;
+    padding: .5rem;
+}
+
+
+    

@@ -37,7 +37,32 @@
         <a id="sponsor-link" href="https://www.facebook.com/EarthWindMap">EarthWindMap</a>
     </div>
 
+    <div class="container">
+        <div>
+        <table id="source-coord">
+            <tr>
+              <th></th>
+              <th>Coordinates</th>
+            </tr>
+
+            <tr>
+              <td>SOURCE</td>
+              <td><input id="source-coord-field" type="text" value="" pattern="[0-9]+"></td>
+            </tr>
+
+            <tr>
+              <td>DESTINATION</td>
+              <td><input id="destination-coord-field" type="text" value="" pattern="[0-9]"></td>
+            </tr>
+
+          </table>
+        </div>
+        <div id="testFunction" class="btnContainer"><button class="backBtn">BACK</button></div>
+    </div>
+
+
     <div id="details">
+        
         <p id="status"></p>
         <div id="location">
             <p>
@@ -89,9 +114,13 @@
                 class="surface text-button" id="isobaric-70hPa">70</span> – <span
                 class="surface text-button" id="isobaric-10hPa">10</span> hPa
             </p> -->
-            <p class="wind-mode">Animate |<span
-                class="text-button" id="animate-currents-back" title="Current">Current</span> - <span
-                class="text-button" id="animate-wind-back" title="Wind">Wind</span>
+            <p class="wind-mode">Animate |
+                <span class="text-button" id="animate-wind-back" title="Wind">Wind</span> - 
+                <span
+              class="text-button" id="animate-currents-back" title="Current">Current</span> -<span
+              class="text-button" id="animate-wave-back" title="Wave">Wave</span>
+                <!--  - <span
+                class="text-button" id="animate-wave-back" title="Wind">Wave</span> -->
                </p>
             <p class="wind-mode">Overlay | <span
                 class="text-button" id="overlay-off">None</span> <!-- – <span
@@ -107,9 +136,12 @@
                 class="text-button" id="overlay-mean_sea_level_pressure" title="Mean Sea Level Pressure">MSLP</span>
             </p> -->
            
-            <p class="ocean-mode invisible">Animate | <span
-                class="text-button" id="animate-currents" title="Current">Current</span> - <span
-                class="text-button" id="animate-wind" title="Wind">Wind</span>
+            <p class="ocean-mode invisible">Animate |<span
+                class="text-button" id="animate-wind" title="Wind">Wind</span> - <span
+                class="text-button" id="animate-currents" title="Current">Current</span> - 
+                <span
+                class="text-button" id="animate-currents" title="Wave">Wave</span>
+               
                
             </p>
             <p class="ocean-mode invisible">Overlay | <span
