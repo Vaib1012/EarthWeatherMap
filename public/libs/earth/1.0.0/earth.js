@@ -6,8 +6,11 @@
  *
  * https://github.com/cambecc/earth
  */
+// let testThis =()=>
 (function() {
     "use strict";
+    let arr=[];
+
 
     var SECOND = 1000;
     var MINUTE = 60 * SECOND;
@@ -220,12 +223,16 @@
             var coastHi = topojson.feature(topo, µ.isMobile() ? o.coastline_110m : o.coastline_50m);
             var lakesLo = topojson.feature(topo, µ.isMobile() ? o.lakes_tiny : o.lakes_110m);
             var lakesHi = topojson.feature(topo, µ.isMobile() ? o.lakes_110m : o.lakes_50m);
-            log.timeEnd("building meshes");
+            // var riverLo = topojson.feature(topo, µ.isMobile() ? o.ne_110m_rivers_lake_centerlines : o.ne_110m_rivers_lake_centerlines);
+            log.timeEnd("building meshes")
+          
             return {
                 coastLo: coastLo,
                 coastHi: coastHi,
                 lakesLo: lakesLo,
-                lakesHi: lakesHi
+                lakesHi: lakesHi,
+                // riverLo: riverLo
+               
             };
         });
     }
@@ -301,22 +308,95 @@
         var lakes = d3.select(".lakes");
         d3.selectAll("path").attr("d", path);  // do an initial draw -- fixes issue with safari
 
-        function drawLocationMark(point, coord) {
-            // show the location on the map if defined
-            if (fieldAgent.value() && !fieldAgent.value().isInsideBoundary(point[0], point[1])) {
-                // UNDONE: Sometimes this is invoked on an old, released field, because new one has not been
-                //         built yet, causing the mark to not get drawn.
-                return;  // outside the field boundary, so ignore.
-            }
-            if (coord && _.isFinite(coord[0]) && _.isFinite(coord[1])) {
-                var mark = d3.select(".location-mark");
-                if (!mark.node()) {
-                    mark = d3.select("#foreground").append("path").attr("class", "location-mark");
-                }
-                mark.datum({type: "Point", coordinates: coord}).attr("d", path);
-            }
+        //event for plot button
+        d3.select("#testPlot").on("click", function() {
+            var sourceCoordinates = d3.select("#source-coord-field").node().value.split(",");
+            var destinationCoordinates = d3.select("#destination-coord-field").node().value.split(",");
+            console.log("src = " +sourceCoordinates);
+            console.log("dest = " +destinationCoordinates);
+          });
+    
+        function PlotSource(latitude,longitude){
+            
         }
 
+        d3.select("#testFunction").on("click", function () {
+            if (arr.length === 1) {
+              d3.select("#source-coord-field").node().value = "";
+            } else {
+              d3.select("#destination-coord-field").node().value = "";
+            }
+            d3.select(`.location-mark-${arr.length}`).remove();
+            arr.pop();
+          });
+        
+          function formToMap() {
+            let source = d3.select("#source-coord-field").node().value;
+            let destination = d3.select("#destination-coord-field").node().value;
+      
+            let [lanS, longS] = source.split(" , ");
+            let [lanD, longD] = destination.split(" , ");
+            console.log(lanS, "- ", longS);
+            console.log(lanD, "- ", longD);
+      
+            drawLocationMark([], [lanS, longS]);
+            drawLocationMark([], [lanD, longD]);
+          }
+    
+        function drawLocationMark(point, coord, signal) {
+            //console.log(point, "aksjhdfk");
+            if (arr.length >= 2) {
+              return;
+            }
+            // console.log(arr.length);
+            // show the location on the map if defined
+            if (
+              fieldAgent.value() &&
+              !fieldAgent.value().isInsideBoundary(point[0], point[1])
+            ) {
+              console.log("----");
+      
+              // UNDONE: Sometimes this is invoked on an old, released field, because new one has not been
+              //         built yet, causing the mark to not get drawn.
+              return; // outside the field boundary, so ignore.
+            }
+            if (coord && _.isFinite(coord[0]) && _.isFinite(coord[1])) {
+              // var mark = d3.select(".location-mark");
+              // if (!mark.node()) {
+              //     mark = d3.select("#foreground").append("path").attr("class", "location-mark");
+              // }
+            
+              var signLat= coord[1]>=0 ? 'N' :'S';
+              var latitude =  " "+ Math.abs(coord[1].toFixed(2)) + " "+signLat;
+              
+              var signLong= coord[0]>=0 ? 'E' :'W';
+              var longitude = " "+ Math.abs(coord[1].toFixed(2)) + " "+signLong;
+
+              console.log(longitude+","+latitude);
+              if (arr.length === 0) {
+                d3.select("#source-coord-field").node().value = latitude +" , " +longitude;
+               
+            } else {
+                d3.select("#destination-coord-field").node().value = latitude +" , " +longitude;
+              }
+      
+              arr = [...arr, coord];
+              // mark.datum({type: "Point", coordinates: coord}).attr("d", path);
+              // arr.map((el)=>{
+              //     console.log(el)
+
+              let mark = d3
+                .select("#foreground")
+                .append("path")
+                .attr("class", `location-mark location-mark-${arr.length}`);
+             
+              return mark
+                .datum({ type: "Point", coordinates: coord })
+                .attr("d", path);
+              // })
+              console.log(arr);
+            }
+          }
         // Draw the location mark if one is currently visible.
         if (activeLocation.point && activeLocation.coord) {
             drawLocationMark(activeLocation.point, activeLocation.coord);
@@ -770,6 +850,9 @@
         });
     }
 
+
+
+
     /**
      * Display the specified overlay value. Allow toggling between the different types of supported units.
      */
@@ -791,6 +874,9 @@
      * The location may not be valid, in which case no callout is displayed. Display location data for both
      * the primary grid and overlay grid, performing interpolation when necessary.
      */
+
+    
+    var cordArr = [];
     function showLocationDetails(point, coord) {
         point = point || [];
         coord = coord || [];
@@ -801,7 +887,10 @@
 
         clearLocationDetails(false);  // clean the slate
         activeLocation = {point: point, coord: coord};  // remember where the current location is
-
+        cordArr.push(coord);
+        // console.log(cordArr);
+        // console.log("not __");
+        // showNewArrSize();
         if (_.isFinite(λ) && _.isFinite(φ)) {
             d3.select("#location-coord").text(µ.formatCoordinates(λ, φ));
             d3.select("#location-close").classed("invisible", false);
@@ -820,7 +909,10 @@
             }
         }
     }
-
+    
+    function showNewArrSize(){
+        console.log("new arr slze is: " + cordArr.length);
+    }
     function updateLocationDetails() {
         showLocationDetails(activeLocation.point, activeLocation.coord);
     }
@@ -853,6 +945,10 @@
      * from newAttr, unless a custom set of keys is provided.
      */
     function bindButtonToConfiguration(elementId, newAttr, keys) {
+        d3.select("#getlocation").on("click", function() {
+            console.log(arr,"thjis")
+        });
+
         keys = keys || _.keys(newAttr);
         d3.select(elementId).on("click", function() {
             if (d3.select(elementId).classed("disabled")) return;
@@ -875,6 +971,7 @@
      * way to accomplish this...
      */
     function init() {
+
         report.status("Initializing...");
 
         d3.select("#sponsor-link")
@@ -1007,6 +1104,9 @@
         // Add event handlers for showing, updating, and removing location details.
         inputController.on("click", showLocationDetails);
         fieldAgent.on("update", updateLocationDetails);
+        //tanmay
+        fieldAgent.on("update",showNewArrSize);
+        fieldAgent.on("click",showNewArrSize);
         d3.select("#location-close").on("click", _.partial(clearLocationDetails, true));
 
         // Modify menu depending on what mode we're in.
@@ -1032,32 +1132,32 @@
         // Add handlers for mode buttons.
         d3.select("#wind-mode-enable").on("click", function() {
             if (configuration.get("param") !== "wind") {
-                configuration.save({param: "wind", surface: "surface", level: "level", overlayType: "off"});
+                configuration.save({param: "wind", surface: "surface", level: "level", overlayType: "default"});
             }
         });
         configuration.on("change:param", function(x, param) {
             d3.select("#wind-mode-enable").classed("highlighted", param === "wind");
         });
-        d3.select("#ocean-mode-enable").on("click", function() {
-            if (configuration.get("param") !== "ocean") {
-                // When switching between modes, there may be no associated data for the current date. So we need
-                // find the closest available according to the catalog. This is not necessary if date is "current".
-                // UNDONE: this code is annoying. should be easier to get date for closest ocean product.
-                var ocean = {param: "ocean", surface: "surface", level: "currents", overlayType: "default"};
-                var attr = _.clone(configuration.attributes);
-                if (attr.date === "current") {
-                    configuration.save(ocean);
-                }
-                else {
-                    when.all(products.productsFor(_.extend(attr, ocean))).spread(function(product) {
-                        if (product.date) {
-                            configuration.save(_.extend(ocean, µ.dateToConfig(product.date)));
-                        }
-                    }).otherwise(report.error);
-                }
-                stopCurrentAnimation(true);  // cleanup particle artifacts over continents
-            }
-        });
+        // d3.select("#ocean-mode-enable").on("click", function() {
+        //     if (configuration.get("param") !== "ocean") {
+        //         // When switching between modes, there may be no associated data for the current date. So we need
+        //         // find the closest available according to the catalog. This is not necessary if date is "current".
+        //         // UNDONE: this code is annoying. should be easier to get date for closest ocean product.
+        //         var ocean = {param: "ocean", surface: "surface", level: "currents", overlayType: "default"};
+        //         var attr = _.clone(configuration.attributes);
+        //         if (attr.date === "current") {
+        //             configuration.save(ocean);
+        //         }
+        //         else {
+        //             when.all(products.productsFor(_.extend(attr, ocean))).spread(function(product) {
+        //                 if (product.date) {
+        //                     configuration.save(_.extend(ocean, µ.dateToConfig(product.date)));
+        //                 }
+        //             }).otherwise(report.error);
+        //         }
+        //         stopCurrentAnimation(true);  // cleanup particle artifacts over continents
+        //     }
+        // });
         configuration.on("change:param", function(x, param) {
             d3.select("#ocean-mode-enable").classed("highlighted", param === "ocean");
         });
@@ -1081,7 +1181,7 @@
         d3.select("#option-show-grid").on("click", function() {
             configuration.save({showGridPoints: !configuration.get("showGridPoints")});
         });
-        configuration.on("change:showGridPointFs", function(x, showGridPoints) {
+        configuration.on("change:showGridPoints", function(x, showGridPoints) {
             d3.select("#option-show-grid").classed("highlighted", showGridPoints);
         });
 
@@ -1092,22 +1192,23 @@
         });
 
         // Add handlers for ocean animation types.
-        bindButtonToConfiguration("#animate-currents", {param: "ocean", surface: "surface", level: "currents",overlayType:"off"});
-        bindButtonToConfiguration("#animate-wind", {param: "wind", surface: "surface", level: "level"});
+       // Add handlers for ocean animation types.
+       bindButtonToConfiguration("#animate-currents", {param: "ocean", surface: "surface", level: "currents",overlayType:"off"});
+       bindButtonToConfiguration("#animate-wind", {param: "wind", surface: "surface", level: "level"});
+       //bindButtonToConfiguration("#animate-wave", {param: "wind", surface: "surface", level: "level"});
 
-        bindButtonToConfiguration("#animate-currents-back", {param: "ocean", surface: "surface", level: "currents"});
-        bindButtonToConfiguration("#animate-wind-back", {param: "wind", surface: "surface", level: "level", overlayType: "off"});
+       bindButtonToConfiguration("#animate-currents-back", {param: "ocean", surface: "surface", level: "currents"});
+       bindButtonToConfiguration("#animate-wind-back", {param: "wind", surface: "surface", level: "level", overlayType: "off"});
+       //bindButtonToConfiguration("#animate-wave-back", {param: "wind", surface: "surface", level: "level", overlayType: "off"});
 
 
-
-        
         // Add handlers for all overlay buttons.
         products.overlayTypes.forEach(function(type) {
             bindButtonToConfiguration("#overlay-" + type, {overlayType: type});
         });
-       // bindButtonToConfiguration("#overlay-wind", {param: "wind", overlayType: "default"});
+        bindButtonToConfiguration("#overlay-wind", {param: "wind", overlayType: "default"});
         bindButtonToConfiguration("#overlay-ocean-off", {overlayType: "off"});
-       // bindButtonToConfiguration("#overlay-currents", {overlayType: "default"});
+        bindButtonToConfiguration("#overlay-currents", {overlayType: "default"});
 
         // Add handlers for all projection buttons.
         globes.keys().forEach(function(p) {
@@ -1128,4 +1229,9 @@
 
     when(true).then(init).then(start).otherwise(report.error);
 
+    return arr;
+
 })();
+
+// export let arr2 = testThis(); 
+
