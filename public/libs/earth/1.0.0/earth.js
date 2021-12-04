@@ -12,6 +12,7 @@
     let arr=[];
 
 
+
     var SECOND = 1000;
     var MINUTE = 60 * SECOND;
     var HOUR = 60 * MINUTE;
@@ -36,6 +37,8 @@
 
     var view = µ.view();
     var log = µ.log();
+
+    var breakpoints = 0;
 
     /**
      * An object to display various types of messages to the user.
@@ -398,26 +401,40 @@
         d3.select("#backBtnFunct").on("click", function () {
             if (arr.length === 1) {
               d3.select("#source-coord-field").node().value = "";
-            } else {
+            } else if(arr.length === 2){
               d3.select("#destination-coord-field").node().value = "";
+            } else {
+                d3.select("#row-"+(arr.length-1)).remove();
+                breakpoints--;
+                console.log(breakpoints);
             }
-            d3.select(`.location-mark-${arr.length}`).remove();
+            d3.select(`.location-mark-${arr.length}`).remove();            
             arr.pop();
         });
 
         d3.select("#addBtnFunct").on("click", function () {
-            //var row = d3.select("#source-coord").append("tr").insert("td").text("Break Point").insert("td");
-            var row = d3.select("#source-coord").append("tr");
-            row.append("td").text("break point");
-            row.append("td").append("input").attr("id","source-coord-field").attr("type","text");
-            
-            // svg.selectAll("circle")
-            // .data(data)
-            // .enter().append("circle")
-            // .attr("cx", function(d) { return d.x; })
-            // .attr("cy", function(d) { return d.y; })
-            // .attr("r", 2.5);
+            addCoorRow();            
         });
+
+
+        function addCoorRow(){
+            var row = d3.select("#coordinates-table").append("tr").attr("id","row-"+(breakpoints+2));
+            row.append("td").text("Break Point "+(breakpoints+1));
+            row.append("td").append("input").attr("id","break-point-"+breakpoints).attr("type","text");
+            breakpoints++;
+        }
+
+        function formatLatitudeAndLongtitude(coord){
+            var signLat= coord[0]>=0 ? 'N' :'S';
+            var latitude =  " "+ Math.abs(coord[0].toFixed(2)) + " "+signLat;
+            
+            var signLong= coord[1]>=0 ? 'E' :'W';
+            var longitude = " "+ Math.abs(coord[1].toFixed(2)) + " "+signLong;
+            return {
+                'latitude' : latitude,
+                'longitude' : longitude
+            }
+        }
 
         d3.select("#plotBtnFunct").on("click", function () {
             
@@ -434,6 +451,20 @@
             console.log(arr)
             arr.push(sourceCoordinate)
             arr.push(destinationCoordinate)
+
+            // for (let i = 1; i < arr.length-1; i++) {
+            //     let coordinate = d3.select("#break-point-"+(i-1)).node().value.split(",");
+            //     arr.push(coordinate.map(el=>+el));
+            //     console.log(typeof(coordinate));
+
+            //     let coorString = coordinate[0] + " " +coordinate[1];
+            //     //if(coorString.includes('N'))
+            //     // let formattedCoordinates = formatLatitudeAndLongtitude(coordinate);
+            //     // d3.select("#break-point-"+(i-1)).node().value = 
+            //     //     formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
+
+            // }
+
             let arr2 = new Set(arr)
             console.log(arr2)
             arr.map((coordEl,i)=>{
@@ -470,12 +501,22 @@
               // if (!mark.node()) {
               //     mark = d3.select("#foreground").append("path").attr("class", "location-mark");
               // }
+
+              var formattedCoordinates = formatLatitudeAndLongtitude(coord);
               if (arr.length === 0) {
                 d3.select("#source-coord-field").node().value =
-                  coord[0] + " , " + coord[1];
-              } else {
+                formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
+              } else if (arr.length === 1){
                 d3.select("#destination-coord-field").node().value =
-                  coord[0] + " , " + coord[1];
+                formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
+              } else {
+                console.log(arr.length +"==="+breakpoints);
+                if(arr.length - 2 >= breakpoints)
+                    addCoorRow();
+                
+                
+                d3.select("#break-point-"+(arr.length - 2)).node().value =  d3.select("#destination-coord-field").node().value;
+                d3.select("#destination-coord-field").node().value = formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
               }
       
               arr = [...arr, coord];
