@@ -341,12 +341,15 @@ th, td, tr{
 }
 
 .backBtn{
-    width: 10rem;
+    width: 5rem;
     padding: .5rem;
+    margin:.5rem;
 }
 
+
 .abc{
-    float:left; 
+    display: flex;
+    float: left;
 }
 
 .location-mark-1{

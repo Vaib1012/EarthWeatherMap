@@ -403,13 +403,24 @@
             }
             d3.select(`.location-mark-${arr.length}`).remove();
             arr.pop();
-          });
+        });
 
-        
+        d3.select("#addBtnFunct").on("click", function () {
+            //var row = d3.select("#source-coord").append("tr").insert("td").text("Break Point").insert("td");
+            var row = d3.select("#source-coord").append("tr");
+            row.append("td").text("break point");
+            row.append("td").append("input").attr("id","source-coord-field").attr("type","text");
+            
+            // svg.selectAll("circle")
+            // .data(data)
+            // .enter().append("circle")
+            // .attr("cx", function(d) { return d.x; })
+            // .attr("cy", function(d) { return d.y; })
+            // .attr("r", 2.5);
+        });
 
         d3.select("#plotBtnFunct").on("click", function () {
             
-    
             let source = d3.select("#source-coord-field").node().value;
             let destination = d3.select("#destination-coord-field").node().value;
           
@@ -435,8 +446,6 @@
               .datum({ type: "Point", coordinates:coordEl })
               .attr("d", path);
             })
-            
-            
           });
          
         function drawLocationMark(point, coord, signal) {
