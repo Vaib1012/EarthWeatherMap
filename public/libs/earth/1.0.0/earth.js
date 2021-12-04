@@ -308,19 +308,94 @@
         var lakes = d3.select(".lakes");
         d3.selectAll("path").attr("d", path);  // do an initial draw -- fixes issue with safari
 
-        //event for plot button
-        d3.select("#testPlot").on("click", function() {
-            var sourceCoordinates = d3.select("#source-coord-field").node().value.split(",");
-            var destinationCoordinates = d3.select("#destination-coord-field").node().value.split(",");
-            console.log("src = " +sourceCoordinates);
-            console.log("dest = " +destinationCoordinates);
-          });
+        // //event for plot button
+        // d3.select("#plotBtnFunct").on("click", function() {
+        //     var sourceCoordinates = d3.select("#source-coord-field").node().value.split(",");
+        //     var destinationCoordinates = d3.select("#destination-coord-field").node().value.split(",");
+        //     console.log("src = " +sourceCoordinates);
+        //     console.log("dest = " +destinationCoordinates);
+        // });
     
-        function PlotSource(latitude,longitude){
+        
+        // d3.select("#backBtnFunct").on("click", function () {
+        //     if (arr.length === 1) {
+        //       d3.select("#source-coord-field").node().value = "";
+        //     } else {
+        //       d3.select("#destination-coord-field").node().value = "";
+        //     }
+        //     d3.select(`.location-mark-${arr.length}`).remove();
+        //     arr.pop();
+        //   });
+        
+        // function formToMap() {
+        // let source = d3.select("#source-coord-field").node().value;
+        // let destination = d3.select("#destination-coord-field").node().value;
+    
+        // let [lanS, longS] = source.split(" , ");
+        // let [lanD, longD] = destination.split(" , ");
+        // console.log(lanS, "- ", longS);
+        // console.log(lanD, "- ", longD);
+    
+        // drawLocationMark([], [lanS, longS]);
+        // drawLocationMark([], [lanD, longD]);
+        // }
+    
+        // function drawLocationMark(point, coord, signal) {
+        //     //console.log(point, "aksjhdfk");
+        //     if (arr.length >= 2) {
+        //       return;
+        //     }
+        //     // console.log(arr.length);
+        //     // show the location on the map if defined
+        //     if (
+        //       fieldAgent.value() &&
+        //       !fieldAgent.value().isInsideBoundary(point[0], point[1])
+        //     ) {
+        //       console.log("----");
+      
+        //       // UNDONE: Sometimes this is invoked on an old, released field, because new one has not been
+        //       //         built yet, causing the mark to not get drawn.
+        //       return; // outside the field boundary, so ignore.
+        //     }
+        //     if (coord && _.isFinite(coord[0]) && _.isFinite(coord[1])) {
+        //       // var mark = d3.select(".location-mark");
+        //       // if (!mark.node()) {
+        //       //     mark = d3.select("#foreground").append("path").attr("class", "location-mark");
+        //       // }
             
-        }
+        //       var signLat= coord[1]>=0 ? 'N' :'S';
+        //       var latitude =  " "+ Math.abs(coord[1].toFixed(2)) + " "+signLat;
+              
+        //       var signLong= coord[0]>=0 ? 'E' :'W';
+        //       var longitude = " "+ Math.abs(coord[1].toFixed(2)) + " "+signLong;
 
-        d3.select("#testFunction").on("click", function () {
+        //       console.log(longitude+","+latitude);
+        //       if (arr.length === 0) {
+        //         d3.select("#source-coord-field").node().value = latitude +" , " +longitude;
+               
+        //     } else {
+        //         d3.select("#destination-coord-field").node().value = latitude +" , " +longitude;
+        //       }
+      
+        //       arr = [...arr, coord];
+        //       // mark.datum({type: "Point", coordinates: coord}).attr("d", path);
+        //       // arr.map((el)=>{
+        //       //     console.log(el)
+
+        //       let mark = d3
+        //         .select("#foreground")
+        //         .append("path")
+        //         .attr("class", `location-mark location-mark-${arr.length}`);
+             
+        //       return mark
+        //         .datum({ type: "Point", coordinates: coord })
+        //         .attr("d", path);
+        //       // })
+        //       console.log(arr);
+        //     }
+        // }
+
+        d3.select("#backBtnFunct").on("click", function () {
             if (arr.length === 1) {
               d3.select("#source-coord-field").node().value = "";
             } else {
@@ -329,26 +404,47 @@
             d3.select(`.location-mark-${arr.length}`).remove();
             arr.pop();
           });
+
         
-          function formToMap() {
+
+        d3.select("#plotBtnFunct").on("click", function () {
+            
+    
             let source = d3.select("#source-coord-field").node().value;
             let destination = d3.select("#destination-coord-field").node().value;
-      
-            let [lanS, longS] = source.split(" , ");
-            let [lanD, longD] = destination.split(" , ");
-            console.log(lanS, "- ", longS);
-            console.log(lanD, "- ", longD);
-      
-            drawLocationMark([], [lanS, longS]);
-            drawLocationMark([], [lanD, longD]);
-          }
+          
     
+            let sourceCoordinate = source.split(",");
+            let destinationCoordinate = destination.split(",");
+            
+            sourceCoordinate=sourceCoordinate.map(el=>+el);
+            destinationCoordinate = destinationCoordinate.map(el=>+el);
+            
+            console.log(arr)
+            arr.push(sourceCoordinate)
+            arr.push(destinationCoordinate)
+            let arr2 = new Set(arr)
+            console.log(arr2)
+            arr.map((coordEl,i)=>{
+              console.log(i);
+              let mark = d3
+              .select("#foreground")
+              .append("path")
+              .attr("class", `location-mark location-mark-${i}`);
+            return mark
+              .datum({ type: "Point", coordinates:coordEl })
+              .attr("d", path);
+            })
+            
+            
+          });
+         
         function drawLocationMark(point, coord, signal) {
-            //console.log(point, "aksjhdfk");
-            if (arr.length >= 2) {
-              return;
-            }
-            // console.log(arr.length);
+            console.log("the Coordinates are:", coord);
+            // if (arr.length >= 2) {
+            //   return;
+            // }
+            console.log(arr.length);
             // show the location on the map if defined
             if (
               fieldAgent.value() &&
@@ -365,31 +461,22 @@
               // if (!mark.node()) {
               //     mark = d3.select("#foreground").append("path").attr("class", "location-mark");
               // }
-            
-              var signLat= coord[1]>=0 ? 'N' :'S';
-              var latitude =  " "+ Math.abs(coord[1].toFixed(2)) + " "+signLat;
-              
-              var signLong= coord[0]>=0 ? 'E' :'W';
-              var longitude = " "+ Math.abs(coord[1].toFixed(2)) + " "+signLong;
-
-              console.log(longitude+","+latitude);
               if (arr.length === 0) {
-                d3.select("#source-coord-field").node().value = latitude +" , " +longitude;
-               
-            } else {
-                d3.select("#destination-coord-field").node().value = latitude +" , " +longitude;
+                d3.select("#source-coord-field").node().value =
+                  coord[0] + " , " + coord[1];
+              } else {
+                d3.select("#destination-coord-field").node().value =
+                  coord[0] + " , " + coord[1];
               }
       
               arr = [...arr, coord];
               // mark.datum({type: "Point", coordinates: coord}).attr("d", path);
               // arr.map((el)=>{
               //     console.log(el)
-
               let mark = d3
                 .select("#foreground")
                 .append("path")
                 .attr("class", `location-mark location-mark-${arr.length}`);
-             
               return mark
                 .datum({ type: "Point", coordinates: coord })
                 .attr("d", path);
@@ -397,6 +484,9 @@
               console.log(arr);
             }
           }
+         
+        
+
         // Draw the location mark if one is currently visible.
         if (activeLocation.point && activeLocation.coord) {
             drawLocationMark(activeLocation.point, activeLocation.coord);

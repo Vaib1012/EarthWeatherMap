@@ -310,7 +310,7 @@ body {
 }
 
 
-table, th, td,#testFunction {
+table, th, td,.abc {
     position: relative;
     z-index: 2;   
     padding: 1px;
@@ -337,14 +337,22 @@ th, td, tr{
 .btnContainer{
     width:100%;
     margin-top: 1rem;
+    
 }
 
 .backBtn{
-    position: absolute;
-    right: -5px;    
     width: 10rem;
     padding: .5rem;
 }
 
+.abc{
+    float:left; 
+}
+
+.location-mark-1{
+    stroke: #e1e431;
+    stroke-width: 2.5;
+    fill: none;
+}
 
     
