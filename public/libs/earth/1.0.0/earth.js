@@ -233,9 +233,7 @@
                 coastLo: coastLo,
                 coastHi: coastHi,
                 lakesLo: lakesLo,
-                lakesHi: lakesHi,
-                // riverLo: riverLo
-               
+                lakesHi: lakesHi,               
             };
         });
     }
@@ -399,12 +397,14 @@
         // }
 
         d3.select("#backBtnFunct").on("click", function () {
-            if (arr.length === 1) {
-              d3.select("#source-coord-field").node().value = "";
-            } else if(arr.length === 2){
-              d3.select("#destination-coord-field").node().value = "";
-            } else {
-                d3.select("#row-"+(arr.length-1)).remove();
+            // if (arr.length === 1) {
+            //   d3.select("#source-coord-field").node().value = "";
+            // } else if(arr.length === 2){
+            //   d3.select("#destination-coord-field").node().value = "";
+            // } else
+             if(arr.length !=0){
+                d3.select("#row-"+(arr.length)).remove();
+                d3.select("#line-"+(arr.length-1)).remove();
                 breakpoints--;
                 console.log(breakpoints);
             }
@@ -418,18 +418,18 @@
 
 
         function addCoorRow(){
-            var row = d3.select("#coordinates-table").append("tr").attr("id","row-"+(breakpoints+2));
-            row.append("td").text("Break Point "+(breakpoints+1));
+            var row = d3.select("#coordinates-table").append("tr").attr("id","row-"+(breakpoints+1));
+            row.append("td").text("Point "+(breakpoints+1));
             row.append("td").append("input").attr("id","break-point-"+breakpoints).attr("type","text");
             breakpoints++;
         }
 
         function formatLatitudeAndLongtitude(coord){
-            var signLat= coord[0]>=0 ? 'N' :'S';
-            var latitude =  " "+ Math.abs(coord[0].toFixed(2)) + " "+signLat;
+            var signLat= coord[1]>=0 ? 'N' :'S';
+            var latitude =  " "+ Math.abs(coord[1].toFixed(2)) + " "+signLat;
             
-            var signLong= coord[1]>=0 ? 'E' :'W';
-            var longitude = " "+ Math.abs(coord[1].toFixed(2)) + " "+signLong;
+            var signLong= coord[0]>=0 ? 'E' :'W';
+            var longitude = " "+ Math.abs(coord[0].toFixed(2)) + " "+signLong;
             return {
                 'latitude' : latitude,
                 'longitude' : longitude
@@ -437,7 +437,6 @@
         }
 
         d3.select("#plotBtnFunct").on("click", function () {
-            
             let source = d3.select("#source-coord-field").node().value;
             let destination = d3.select("#destination-coord-field").node().value;
           
@@ -446,24 +445,11 @@
             let destinationCoordinate = destination.split(",");
             
             sourceCoordinate=sourceCoordinate.map(el=>+el);
-            destinationCoordinate = destinationCoordinate.map(el=>+el);
+            destinationCoordinate = destinationCoordinate.map(el=>+el);    cxdsfds
             
             console.log(arr)
             arr.push(sourceCoordinate)
             arr.push(destinationCoordinate)
-
-            // for (let i = 1; i < arr.length-1; i++) {
-            //     let coordinate = d3.select("#break-point-"+(i-1)).node().value.split(",");
-            //     arr.push(coordinate.map(el=>+el));
-            //     console.log(typeof(coordinate));
-
-            //     let coorString = coordinate[0] + " " +coordinate[1];
-            //     //if(coorString.includes('N'))
-            //     // let formattedCoordinates = formatLatitudeAndLongtitude(coordinate);
-            //     // d3.select("#break-point-"+(i-1)).node().value = 
-            //     //     formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
-
-            // }
 
             let arr2 = new Set(arr)
             console.log(arr2)
@@ -479,19 +465,15 @@
             })
           });
          
+          var pointsArr;
         function drawLocationMark(point, coord, signal) {
-            console.log("the Coordinates are:", coord);
-            // if (arr.length >= 2) {
-            //   return;
-            // }
+            console.log("pt"+point);
             console.log(arr.length);
             // show the location on the map if defined
             if (
               fieldAgent.value() &&
               !fieldAgent.value().isInsideBoundary(point[0], point[1])
-            ) {
-              console.log("----");
-      
+            ) {      
               // UNDONE: Sometimes this is invoked on an old, released field, because new one has not been
               //         built yet, causing the mark to not get drawn.
               return; // outside the field boundary, so ignore.
@@ -503,43 +485,51 @@
               // }
 
               var formattedCoordinates = formatLatitudeAndLongtitude(coord);
-              if (arr.length === 0) {
-                d3.select("#source-coord-field").node().value =
-                formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
-              } else if (arr.length === 1){
-                d3.select("#destination-coord-field").node().value =
-                formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
-              } else {
-                console.log(arr.length +"==="+breakpoints);
-                if(arr.length - 2 >= breakpoints)
+            //   if (arr.length === 0) {
+            //     d3.select("#source-coord-field").node().value =
+            //     formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
+            //   } else if (arr.length === 1){
+            //     d3.select("#destination-coord-field").node().value =
+            //     formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
+            //   } else {
+                if(arr.length  >= breakpoints)
                     addCoorRow();
-                
-                
-                d3.select("#break-point-"+(arr.length - 2)).node().value =  d3.select("#destination-coord-field").node().value;
-                d3.select("#destination-coord-field").node().value = formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
-              }
+
+                d3.select("#break-point-"+(arr.length)).node().value =  formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
+             // }
       
               arr = [...arr, coord];
               // mark.datum({type: "Point", coordinates: coord}).attr("d", path);
               // arr.map((el)=>{
               //     console.log(el)
               let mark = d3
-                .select("#foreground")
+                .select("#foreground").append("g").attr("id",`div-mark-${arr.length}`)
                 .append("path")
-                .attr("class", `location-mark location-mark-${arr.length}`);
-              return mark
+                .attr("class", `location-mark location-mark-${arr.length}`)
                 .datum({ type: "Point", coordinates: coord })
-                .attr("d", path);
-              // })
-              console.log(arr);
+                .attr("d", path).attr("fill","black");
+
+                d3.select(`#div-mark-${arr.length}`).append("text").node().value="1";
+
+                if(arr.length >1){
+                    d3.select("#foreground")
+                    .append('path').attr("id","line-"+(arr.length-1))
+                    .attr('d', d3.svg.line()([[point[0], point[1]], [pointsArr[0], pointsArr[1]]]))
+                    .attr('stroke', 'yellow');
+
+                    console.log("line-"+(arr.length-1));
+                }
+
+                pointsArr=point;
+              return mark;
+               
             }
-          }
-         
-        
+        }        
 
         // Draw the location mark if one is currently visible.
         if (activeLocation.point && activeLocation.coord) {
             drawLocationMark(activeLocation.point, activeLocation.coord);
+
         }
 
         // Throttled draw method helps with slow devices that would get overwhelmed by too many redraw events.
@@ -1335,11 +1325,11 @@
        // Add handlers for ocean animation types.
        bindButtonToConfiguration("#animate-currents", {param: "ocean", surface: "surface", level: "currents",overlayType:"off"});
        bindButtonToConfiguration("#animate-wind", {param: "wind", surface: "surface", level: "level"});
-       //bindButtonToConfiguration("#animate-wave", {param: "wind", surface: "surface", level: "level"});
+       bindButtonToConfiguration("#animate-wave", {param: "wave", surface: "surface", level: "level"});
 
        bindButtonToConfiguration("#animate-currents-back", {param: "ocean", surface: "surface", level: "currents"});
        bindButtonToConfiguration("#animate-wind-back", {param: "wind", surface: "surface", level: "level", overlayType: "off"});
-       //bindButtonToConfiguration("#animate-wave-back", {param: "wind", surface: "surface", level: "level", overlayType: "off"});
+       bindButtonToConfiguration("#animate-wave-back", {param: "wave", surface: "surface", level: "level", overlayType: "off"});
 
 
         // Add handlers for all overlay buttons.
