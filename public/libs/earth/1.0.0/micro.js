@@ -6,7 +6,7 @@
  *
  * https://github.com/cambecc/earth
  */
-var µ = function() {
+ var µ = function() {
     "use strict";
 
     var τ = 2 * Math.PI;
@@ -315,6 +315,12 @@ var µ = function() {
         return wd.toFixed(0) + "° @ " + formatScalar(wind[2], units);
     }
 
+    function formatVectorValue(wind, units) {
+        var d = Math.atan2(-wind[0], -wind[1]) / τ * 360;  // calculate into-the-wind cardinal degrees
+        var wd = Math.round((d + 360) % 360 / 5) * 5;  // shift [-180, 180] to [0, 360], and round to nearest 5.
+        return ""+formatScalar(wind[2], units);
+    }
+
     /**
      * Returns a promise for a JSON resource (URL) fetched via XHR. If the load fails, the promise rejects with an
      * object describing the reason: {status: http-status-code, message: http-status-text, resource:}.
@@ -620,6 +626,7 @@ var µ = function() {
     }
 
     return {
+        formatVectorValue:formatVectorValue,
         isTruthy: isTruthy,
         isValue: isValue,
         coalesce: coalesce,
