@@ -243,7 +243,7 @@ body {
 .location-mark {
     stroke: #3aff3a;
     stroke-width: 2.5;
-    fill: none;
+    fill : #3aff3a;
 }
 
 /**************************************************************************************************
@@ -355,7 +355,7 @@ th, td, tr{
 .location-mark-1{
     stroke: #e1e431;
     stroke-width: 2.5;
-    fill: none;
+    fill:#e1e431;
 }
 
     
