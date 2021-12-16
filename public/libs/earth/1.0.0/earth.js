@@ -421,11 +421,14 @@
             return d ==  null ? {x: d3.event.x, y: d3.event.y} : d;
         }
 
-        
+        let offset = { x: 0, y: 0 };
         function dragStart() {
             // Set the offset values
-            offset.x = d3.event.x - d3.select(this).attr('cx');
-            offset.y = d3.event.y - d3.select(this).attr('cy');
+            // offset.x = d3.event.x - d3.select(this).attr('cx');
+            // offset.y = d3.event.y - d3.select(this).attr('cy');
+//https://observablehq.com/@harrylove/drag-a-circle-with-d3
+            offset.x = d3.event.x - 100;
+            offset.y = d3.event.y - 100;
         }
         
 
@@ -436,6 +439,7 @@
             d3.select(this).attr("d", path);
             // .attr('cx', d3.event.x - offset.x)
             // .attr('cy', d3.event.y - offset.y);
+            console.log("hhh")
         }
 
     
@@ -483,7 +487,7 @@
                 .datum({ type: "Point", coordinates: coord })
                 .attr("d", path).attr("fill","black").call(
                     // Attach drag event handlers to the point
-                    d3.behavior.drag
+                    d3.behavior.drag()
                       .on('dragstart', dragStart)
                       .on('drag', drag)
                   );;
