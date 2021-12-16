@@ -308,6 +308,8 @@
         var coastline = d3.select(".coastline");
         var lakes = d3.select(".lakes");
         d3.selectAll("path").attr("d", path);  // do an initial draw -- fixes issue with safari
+        console.log(path);
+        console.log(typeof(d3.geo.path()));
 
 
         d3.select("#backBtnFunct").on("click", function () {
