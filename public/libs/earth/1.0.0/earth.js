@@ -312,6 +312,8 @@
         var linesArr=[];
         
         d3.selectAll("path").attr("d", path);  // do an initial draw -- fixes issue with safari
+        console.log(path);
+        console.log(typeof(d3.geo.path()));
 
 
         d3.select("#backBtnFunct").on("click", function () {
