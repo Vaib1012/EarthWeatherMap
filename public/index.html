@@ -17,7 +17,7 @@
     <link rel="apple-touch-icon" sizes="120x120" href="/iphone-icon.png"/>
     <link rel="apple-touch-icon" sizes="152x152" href="/ipad-icon.png"/>
     <link rel="stylesheet" type="text/css" href="/styles/styles.css"/>
-
+    <link href="https://pro.fontawesome.com/releases/v6.0.0-beta1/css/all.css" rel="stylesheet">
     <link rel="alternate" hreflang="x-default" href="http://earth.nullschool.net/"/>
     <link rel="alternate" hreflang="ja" href="http://earth.nullschool.net/jp/"/>
 </head>
@@ -36,39 +36,67 @@
         <p><span id="sponsor-hide" class="text-button invisible"> ✕ </span>community</p>
         <a id="sponsor-link" href="https://www.facebook.com/EarthWindMap">EarthWindMap</a>
     </div>
+   
+    <button id="myBtn" class="dropbtn">Coordinates</button>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+    
+      <!-- Modal content -->
+     
+      <div class="modal-content">
+        
+          <table id="coordinates-table">
+              
+                <span class="close">&times;</span>
+                <!-- <th></th>
+                <th>Coordinates</th>
+              </tr>
+    
+              <tr>
+                <td>SOURCE</td>
+                <td>
+                  <a><input id="source-coord-field" type="text" value="" pattern="[0-9]+" /></a>
+                </td>
+              </tr>
+    
+              <tr>
+                <td>DESTINATION</td>
+                <td>
+                  <a><input id="destination-coord-field" type="text" value="" pattern="[0-9]" /></a>
+                </td> -->
+              
+            </table>
+          
+        
+    
+    </div>
+    </div>
 
     <div class="container">
         <div class="abc">
             <!-- <div id="plotBtnFunct" class="btnContainer"><button class="backBtn">PLOT</button></div>          -->
-            <div id="addBtnFunct" class="btnContainer"><button class="backBtn">ADD</button></div>          
+            <!-- <div id="addBtnFunct" class="btnContainer"><button class="backBtn">ADD</button></div>           -->
             <div id="backBtnFunct" class="btnContainer"><button class="backBtn">BACK</button></div>
-        </div>  
+        </div> 
+       
 
-        <div>
-        <table id="coordinates-table">
-            <tr>
-              <th></th>
-              <th>Coordinates</th>
-            </tr>
-<!-- 
-            <tr>
-              <td>SOURCE</td>
-              <td><input id="source-coord-field" type="text" value="" pattern="[0-9]+"></td>
-            </tr>
-
-            <tr>
-              <td>DESTINATION</td>
-              <td><input id="destination-coord-field" type="text" value="" pattern="[0-9]"></td>
-            </tr> -->
-
-          </table>
-        </div>
-
-        
-    </div>
-
+        <nav id="overlay1" ><a>
+          
+          <div class="add" ><i class="fas fa-wind" id="add1"></i> WIND</div>
+      </a><a >
+          
+          <div class="add"><i class="fas fa-globe" id="add1"></i> Weather </div>
+      </a><a >
+          
+          <div class="add"><i class="fas fa-satellite" id="add1"></i> Satellite</div>
+      </a><a >
+          
+          <div class="add"><i class="fas fa-poo-storm" id="add1"></i> Thunderstorm</div>
+      </a></nav>
 
     <div id="details">
+      
         
         <p id="status"></p>
         <div id="location">
@@ -99,15 +127,7 @@
             <p>Data | <span id="data-layer"></span></p>
             <p><span id="scale-label">Scale | </span><canvas id="scale"></canvas></p>
             <p>Source | <span id="data-center"></span></p>
-            <p>Control | <span
-                class="text-button" id="nav-now" title="Current Conditions">Now</span><span
-                class="text-button" id="nav-backward-more"> « </span> – <span
-                class="text-button" id="nav-backward"> ‹ </span> – <span
-                class="text-button" id="nav-forward"> › </span> – <span
-                class="text-button" id="nav-forward-more"> » </span><span
-                class="text-button" id="show-location" title="Current Position">〖◯〗</span><span
-                class="text-button" id="option-show-grid" title="Toggle Grid">Grid</span>
-            </p>
+           
             <p>Mode |<span
                 class="text-button" id="ocean-mode-enable">Ocean</span>
             </p>
@@ -169,15 +189,38 @@
                 class="proj text-button" id="waterman" title="Waterman Butterfly">WB</span> – <span
                 class="proj text-button" id="winkel3" title="Winkel Tripel">W3</span> -->
             </p>
-            <!--<p>免責事項 | 正確な情報を提供するためのものではありません</p>-->
-            <p id="lang"><a href="/jp" class="internal-link">日本語</a></p>
-            <p>
-                <a href="about.html" class="internal-link">about</a>
-                <a href="https://www.facebook.com/EarthWindMap" class="social-icon" title="Facebook">&#xe027;</a>
-                <a href="https://twitter.com/cambecc" class="social-icon" title="Twitter">&#xe086;</a>
-            </p>
+            
         </div>
     </div>
+   
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+        
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+        
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+        
+        // When the user clicks the button, open the modal 
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
+        
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+        
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+      
+        </script>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js" charset="utf-8"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js" charset="utf-8"></script>
@@ -199,6 +242,8 @@
     <script src="/libs/earth/1.0.0/globes.js" charset="utf-8"></script>
     <script src="/libs/earth/1.0.0/products.js" charset="utf-8"></script>
     <script src="/libs/earth/1.0.0/earth.js" charset="utf-8"></script>
+    </div>
+    
 
 </body>
 </html>

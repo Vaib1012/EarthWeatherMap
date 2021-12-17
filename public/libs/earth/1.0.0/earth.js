@@ -307,18 +307,18 @@
         var path = d3.geo.path().projection(globe.projection).pointRadius(7);
         var coastline = d3.select(".coastline");
         var lakes = d3.select(".lakes");
+        
+        var pointsArr=[]; 
+        var linesArr=[];
+        
         d3.selectAll("path").attr("d", path);  // do an initial draw -- fixes issue with safari
 
 
         d3.select("#backBtnFunct").on("click", function () {
-            // if (arr.length === 1) {
-            //   d3.select("#source-coord-field").node().value = "";
-            // } else if(arr.length === 2){
-            //   d3.select("#destination-coord-field").node().value = "";
-            // } else
+            
              if(arr.length !=0){
                 d3.select("#row-"+(arr.length)).remove();
-                d3.select("#line-"+(arr.length-1)).remove();
+                d3.select(".location-line-"+(arr.length)).remove();
                 breakpoints--;
                 console.log(breakpoints);
             }
@@ -333,9 +333,9 @@
 
         function addCoorRow(){
             var row = d3.select("#coordinates-table").append("tr").attr("id","row-"+(breakpoints+1));
-            row.append("td").text("Point "+(breakpoints+1));
-            row.append("td").append("input").attr("id","break-point-"+breakpoints).attr("type","text");
-            row.append("td").append("input").attr("id","weather-data-"+breakpoints).attr("type","text");
+            row.append("td").text("Point "+(breakpoints+1)).attr("class","cell1");
+            row.append("td").append("input").attr("id","break-point-"+breakpoints).attr("type","text").attr("class","cell2");
+            row.append("td").append("input").attr("id","weather-data-"+breakpoints).attr("type","text").attr("class","cell3");
            
             breakpoints++;
         }
@@ -378,44 +378,7 @@
                 'longitude' : longitude
             }
         }
-
-        d3.select("#plotBtnFunct").on("click", function () {
-            let source = d3.select("#source-coord-field").node().value;
-            let destination = d3.select("#destination-coord-field").node().value;
-          
-    
-            let sourceCoordinate = source.split(",");
-            let destinationCoordinate = destination.split(",");
-            
-            sourceCoordinate=sourceCoordinate.map(el=>+el);
-            destinationCoordinate = destinationCoordinate.map(el=>+el);    cxdsfds
-            
-            console.log(arr)
-            arr.push(sourceCoordinate)
-            arr.push(destinationCoordinate)
-
-            let arr2 = new Set(arr)
-            console.log(arr2)
-            arr.map((coordEl,i)=>{
-              console.log(i);
-              let mark = d3
-              .select("#foreground")
-              .append("path")
-              .attr("class", `location-mark location-mark-${i}`);
-            return mark
-              .datum({ type: "Point", coordinates:coordEl })
-              .attr("d", path);
-            })
-        });
          
-        var pointsArr;
-        //var drag = d3.drag();
-         // Define drag behavior
-         
-        //  .datum({ type: "Point", coordinates: coord })
-        //  .attr("d", path)
- 
-
 
         function subject(d) {
             return d ==  null ? {x: d3.event.x, y: d3.event.y} : d;
@@ -424,88 +387,165 @@
         let offset = { x: 0, y: 0 };
         function dragStart() {
             // Set the offset values
-            // offset.x = d3.event.x - d3.select(this).attr('cx');
-            // offset.y = d3.event.y - d3.select(this).attr('cy');
-//https://observablehq.com/@harrylove/drag-a-circle-with-d3
+            offset.x = d3.event.x - d3.select(this).attr('cx');
+            offset.y = d3.event.y - d3.select(this).attr('cy');
+            https://observablehq.com/@harrylove/drag-a-circle-with-d3
+
             offset.x = d3.event.x - 100;
             offset.y = d3.event.y - 100;
         }
         
 
-         // drag is called continuously
+        // drag is called continuously
         function drag() {
             // Set the value of the circle coordinates
             // and maintain the click/touch offset
-            d3.select(this).attr("d", path);
+            d3.select(this)
             // .attr('cx', d3.event.x - offset.x)
             // .attr('cy', d3.event.y - offset.y);
             console.log("hhh")
+            console.log(d3.geo.path());
+
         }
 
-    
-        function drawLocationMark(point, coord, signal) {
+        var pointsArr;
+        let arr = [];
+        var marked=false;
+        var clicked;
+        function drawLocationMark(point, coord) {
             // show the location on the map if defined
             if (
               fieldAgent.value() &&
               !fieldAgent.value().isInsideBoundary(point[0], point[1])
-            ) {      
+            ) {
               // UNDONE: Sometimes this is invoked on an old, released field, because new one has not been
               //         built yet, causing the mark to not get drawn.
               return; // outside the field boundary, so ignore.
             }
             if (coord && _.isFinite(coord[0]) && _.isFinite(coord[1])) {
-              // var mark = d3.select(".location-mark");
-              // if (!mark.node()) {
-              //     mark = d3.select("#foreground").append("path").attr("class", "location-mark");
-              // }
-
-              var formattedCoordinates = formatLatitudeAndLongtitude(coord);
-            //   if (arr.length === 0) {
-            //     d3.select("#source-coord-field").node().value =
-            //     formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
-            //   } else if (arr.length === 1){
-            //     d3.select("#destination-coord-field").node().value =
-            //     formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
-            //   } else {
-                if(arr.length  >= breakpoints)
-                    addCoorRow();
-
-                let colId="#weather-data-"+(arr.length);
-                console.log(d3.select(colId).node()+"");
-                d3.select(colId).node().value = getWindAtLocation(coord,colId);
-                d3.select("#break-point-"+(arr.length)).node().value =  formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
-             // }
-      
+              
               arr = [...arr, coord];
-              // mark.datum({type: "Point", coordinates: coord}).attr("d", path);
-              // arr.map((el)=>{
-              //     console.log(el)
+      
+              let oldpoints = d3.selectAll(".location-mark");
+             
+         
+              for (let i = 0; i < oldpoints[0].length; i++) {
+               
+                let x = oldpoints[0][i].getBoundingClientRect().left + 7;
+                let y = oldpoints[0][i].getBoundingClientRect().top + 7;
+                 
+                
+                if (Math.abs(x - point[0]) <= 7 && Math.abs(y - point[1]) <= 7  && marked==false) {
+                  marked=true;
+                 clicked=i+1;
+                 console.log("clicked",clicked);
+                  
+                  return;
+                }
+                else if(marked==true  && Math.abs(x - point[0]) > 7 && Math.abs(y - point[1]) > 7)
+                {
+                    console.log("second time clicked");
+                    console.log(clicked);
+                    d3.select(`#div-mark-${clicked}`).remove();
+    
+                d3
+                .select("#foreground")
+                .append("g")
+                .attr("id", `div-mark-${clicked}`)
+                .append("path")
+                .attr("class", `location-mark location-mark-${clicked}`)
+                .datum({ type: "Point", coordinates: coord })
+                .attr("d", path)
+                .attr("fill", "none");
+                    marked=false;
+                    return;
+                }
+            
+    
+    
+    
+              }
+        
               let mark = d3
-                .select("#foreground").append("g").attr("id",`div-mark-${arr.length}`)
+                .select("#foreground")
+                .append("g")
+                .attr("id", `div-mark-${arr.length}`)
                 .append("path")
                 .attr("class", `location-mark location-mark-${arr.length}`)
                 .datum({ type: "Point", coordinates: coord })
-                .attr("d", path).attr("fill","black").call(
-                    // Attach drag event handlers to the point
-                    d3.behavior.drag()
-                      .on('dragstart', dragStart)
-                      .on('drag', drag)
-                  );;
-
-            if(arr.length >1){
+                .attr("d", path)
+                .attr("fill", "none");
+      
+    
+    
+                
+              d3.select(`#div-mark-${arr.length}`).append("text").node().value = "1";
+      
+              if (arr.length > 1) {
+                console.log("drawing arks again");
                 d3.select("#foreground")
-                .append('path').attr("id","line-"+(arr.length-1))
-                .attr('d', d3.svg.line()([[point[0], point[1]], [pointsArr[0], pointsArr[1]]]))
-                .attr('stroke', 'yellow').attr("stroke-width","3px");
-
-                console.log("line-"+(arr.length-1));
-            }
-
-              pointsArr=point;
+                  .append("g")
+                  .attr("id", "line-" + (arr.length - 1))
+                  .append("path")
+                  .attr("class", `location-line location-line-${arr.length}`)
+                  .datum({
+                    type: "Line",
+                    data: [
+                      [point[0], point[1]],
+                      [pointsArr[0], pointsArr[1]],
+                    ],
+                  })
+                  .attr(
+                    "d",
+                    d3.svg.line()([
+                      [point[0], point[1]],
+                      [pointsArr[0], pointsArr[1]],
+                    ])
+                  )
+                  .attr(
+                    "value",
+                    d3.svg.line()([
+                      [point[0], point[1]],
+                      [pointsArr[0], pointsArr[1]],
+                    ])
+                  )
+                  .attr('stroke', 'yellow').attr("stroke-width","3px");
+              }
+      
+              pointsArr = point;
               return mark;
-               
             }
-        }        
+          }
+        
+        function drawLinesAgain(){
+
+            for(var i=0; i<linesArr.length;i++){
+                linesArr[i].remove();
+            }
+
+            if(pointsArr.length != 0){
+                let x1 = pointsArr[0].getBoundingClientRect().left + 7;
+                console.log("type point: "+ typeof(x1));
+                let y1 = pointsArr[0].getBoundingClientRect().top + 7;
+
+                var arrPoints=d3.select
+                for(var i=1;i<pointsArr.length;i++){
+                    let x2 = pointsArr[i].getBoundingClientRect().left + 7;
+                    let y2 = pointsArr[i].getBoundingClientRect().top + 7;
+
+                    let line=d3.select("#foreground")
+                    .append('path').attr("id","line-"+(arr.length-1)).attr("class","line")
+                    .attr('d', d3.svg.line()([[x1, y1], [x2, y2]]))
+                    .attr('stroke', 'yellow').attr("stroke-width","3px");
+                    linesArr.push(line);
+
+                    x1=x2;
+                    y1=y2;
+                }
+            }
+
+            
+        }
 
         // Draw the location mark if one is currently visible.
         if (activeLocation.point && activeLocation.coord) {
@@ -536,7 +576,66 @@
                 moveEnd: function() {
                     coastline.datum(mesh.coastHi);
                     lakes.datum(mesh.lakesHi);
-                    d3.selectAll("path").attr("d", path);
+                     
+                    if (arr.length == 0) {
+                        d3.selectAll("path").attr("d", path);
+                    } else {
+                        let linArr = d3.selectAll(".location-line");
+                    
+                        d3.select(".location-line").remove();
+                        console.log(linArr, "====");
+            
+                        let newpoints = [];
+            
+                        d3.selectAll(".location-mark")[0].map((element) => {
+                        
+                        newpoints.push({
+                            x: element.getBoundingClientRect().left + 7,
+                            y: element.getBoundingClientRect().top + 7,
+                        });
+                        });
+            
+                        for (let i = 1; i < newpoints.length; i++) {
+                        d3.select("#foreground")
+                            .append("g")
+                            .attr("id", "line-" + (arr.length - 1))
+                            .append("path")
+                            .attr("class", `location-line location-line-${arr.length}`)
+                            .datum({
+                            type: "Line",
+                            data: [
+                                [newpoints[i - 1].x, newpoints[i - 1].y],
+                                [newpoints[i].x, newpoints[i].y],
+                            ],
+                            })
+                            .attr(
+                            "d",
+                            d3.svg.line()([
+                                [newpoints[i - 1].x, newpoints[i - 1].y],
+                                [newpoints[i].x, newpoints[i].y],
+                            ])
+                            )
+                            .attr(
+                            "value",
+                            d3.svg.line()([
+                                [newpoints[i - 1].x, newpoints[i - 1].y],
+                                [newpoints[i].x, newpoints[i].y],
+                            ])
+                            )
+                            .attr('stroke', 'yellow').attr("stroke-width","3px");
+                        }
+                        /* linArr[0].map((el) => {
+                        d3.select(`.${el.attributes.class.value.split(" ")[1]}`).attr(
+                            "d",
+                            el.attributes.value.value
+                        );
+                        return el;
+                        }); */
+                        let x = newpoints[newpoints.length-1].x;
+                        let y = newpoints[newpoints.length-1].y;
+                        pointsArr = [x,y]
+                    }
+                   
                     rendererAgent.trigger("render");
                 },
                 click: drawLocationMark
