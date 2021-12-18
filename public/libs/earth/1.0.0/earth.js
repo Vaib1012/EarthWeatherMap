@@ -427,7 +427,8 @@
             if (coord && _.isFinite(coord[0]) && _.isFinite(coord[1])) {
               
               arr = [...arr, coord];
-      
+
+             
               let oldpoints = d3.selectAll(".location-mark");
              
          
@@ -478,10 +479,8 @@
                 .attr("d", path)
                 .attr("fill", "none");
       
-    
-    
                 
-              d3.select(`#div-mark-${arr.length}`).append("text").node().value = "1";
+              //d3.select(`#div-mark-${arr.length}`).append("text").node().value = "1";
       
               if (arr.length > 1) {
                 console.log("drawing arks again");
@@ -515,6 +514,18 @@
               }
       
               pointsArr = point;
+
+
+              var formattedCoordinates = formatLatitudeAndLongtitude(coord);
+              console.log(formattedCoordinates)
+                 if(arr.length  >= breakpoints)
+                     addCoorRow();
+
+                  d3.select("#break-point-"+(arr.length-1)).node().value =  formattedCoordinates['latitude'] + " , " + formattedCoordinates['longitude'];
+                  d3.select("#weather-data-"+(arr.length-1)).node().value =  getWindAtLocation(coord);
+                
+      
+
               return mark;
             }
           }
